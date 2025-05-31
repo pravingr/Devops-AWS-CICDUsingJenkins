@@ -10,7 +10,7 @@ pipeline {
             steps {
                 script {
                     if (!params.Branch.startsWith('release-')) {
-                        error "Invalid Branch: '${params.ENVIRONMENT}'. Branch name must start with 'release-'"
+                        error "Invalid Branch: '${params.Branch}'. Branch name must start with 'release-'"
                     }
                     echo "Validation Success!"
                 }
@@ -18,7 +18,7 @@ pipeline {
         }    
         stage('Build') {
             steps {
-                echo 'Building..${params.Branch}'
+                echo "Building..${params.Branch}"
             }
         }
         stage('QA') {
@@ -42,12 +42,5 @@ pipeline {
         always { 
             echo 'Finished!'
         }
-        success { 
-            echo 'Success!'
-        }
-        failure { 
-            echo 'Failed!'
-        }
-        
     }
 }
