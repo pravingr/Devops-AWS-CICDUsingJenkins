@@ -1,15 +1,34 @@
 pipeline {
     agent any
+    
+    parameters {
+        string(name: 'Branch', defaultValue: '', description: 'Provide branch name')
+    }
 
     stages {
+        stage('Validate') {
+            steps {
+                script {
+                    if (!params.Branch.startsWith('release-')) {
+                        error "Invalid Branch: '${params.ENVIRONMENT}'. Branch name must start with 'release-'"
+                    }
+                    echo "Validation Success!"
+                }
+            }
+        }    
         stage('Build') {
             steps {
-                echo 'Building..'
+                echo 'Building..${params.Branch}'
             }
         }
-        stage('Test') {
+        stage('QA') {
             steps {
-                echo 'Testing..'
+                echo 'Sonar Test..'
+            }
+        }
+        stage('Realease') {
+            steps {
+                echo 'Storing Artifacts....'
             }
         }
         stage('Deploy') {
@@ -17,5 +36,18 @@ pipeline {
                 echo 'Deploying....'
             }
         }
+    }
+    
+    post { 
+        always { 
+            echo 'Finished!'
+        }
+        success { 
+            echo 'Success!'
+        }
+        failure { 
+            echo 'Failed!'
+        }
+        
     }
 }
