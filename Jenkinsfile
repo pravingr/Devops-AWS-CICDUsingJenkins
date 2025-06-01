@@ -5,6 +5,11 @@ pipeline {
         string(name: 'Branch', defaultValue: '', description: 'Provide branch name')
     }
     
+    environment  {
+        scannerHome = tool 'SonarQubeScanner'
+        projectKey = 'sonarqube-token'
+}
+    
     tools {
         maven 'Maven'   // Name must match Global Tool Config in Jenkins
     }
@@ -24,14 +29,20 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Building..${params.Branch}"
-                timeout(time: 10, unit: 'MINUTES') {
-        sh 'mvn clean install'
-                }
+                sh 'mvn clean install'
             }
         }
         stage('QA') {
             steps {
                 echo 'Sonar Test..'
+                withSonarQubeEnv(credentialsId: 'sonarqube-token') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=${projectKey} \
+                            -Dsonar.sources=. \
+                            """
+                }
+
             }
         }
         stage('Realease') {
