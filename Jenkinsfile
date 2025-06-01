@@ -35,14 +35,17 @@ pipeline {
         stage('QA') {
             steps {
                 echo 'Sonar Test..'
-                withSonarQubeEnv(credentialsId: 'sonarqube-token') {
+               
+                    withSonarQubeEnv('sonarqube') {
                         sh """
                             ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=${projectKey} \
-                            -Dsonar.sources=. \
+                            -Dsonar.sources=src/main/java \
+                            -Dsonar.java.binaries=target/classes \
+                            -Dsonar.host.url=http://13.233.29.208:9000 \
+                            -Dsonar.login=${projectKey}
                             """
-                }
-
+            }
             }
         }
         stage('Realease') {
