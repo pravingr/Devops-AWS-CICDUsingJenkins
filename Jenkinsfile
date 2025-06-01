@@ -4,6 +4,10 @@ pipeline {
     parameters {
         string(name: 'Branch', defaultValue: '', description: 'Provide branch name')
     }
+    
+    tools {
+        maven 'Maven'   // Name must match Global Tool Config in Jenkins
+    }
 
     stages {
         stage('Validate') {
@@ -14,11 +18,15 @@ pipeline {
                     }
                     echo "Validation Success!"
                 }
+                git branch: params.Branch, url: 'https://github.com/pravingr/Devops-AWS-CICDUsingJenkins.git/'
             }
         }    
         stage('Build') {
             steps {
                 echo "Building..${params.Branch}"
+                timeout(time: 10, unit: 'MINUTES') {
+        sh 'mvn clean install'
+                }
             }
         }
         stage('QA') {
